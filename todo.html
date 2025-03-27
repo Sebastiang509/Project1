@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🦒 Wichita Todo + Weather App</title>
+  <title>🦒 Todo + Weather + Image App</title>
   <style>
     body {
       font-family: sans-serif;
@@ -11,10 +11,6 @@
       margin: 40px auto;
       padding: 20px;
       background: #f0f4f8;
-      background-size: cover;
-      background-position: center;
-      color: #333;
-      backdrop-filter: brightness(95%);
     }
     h1, h2 {
       text-align: center;
@@ -29,7 +25,7 @@
     }
     li {
       margin: 10px 0;
-      background: #ffffffcc;
+      background: #fff;
       padding: 10px;
       display: flex;
       justify-content: space-between;
@@ -38,19 +34,24 @@
     }
     li.done {
       text-decoration: line-through;
-      background-color: #c3f7c3cc;
+      background-color: #c3f7c3;
     }
-    .weather {
+    .weather, .image {
       margin-top: 30px;
       text-align: center;
-      background: #e0f7facc;
+      background: #e0f7fa;
       padding: 15px;
       border-radius: 8px;
+    }
+    #randomImage {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>🦒 Wichita To-Do List</h1>
+  <h1>🦒 To-Do List</h1>
   <div>
     <input type="text" id="taskInput" placeholder="Add a new task..." />
     <button onclick="addTask()">Add</button>
@@ -59,12 +60,17 @@
   <ul id="taskList"></ul>
 
   <div class="weather">
-    <h2>🌤️ Current Weather in Wichita, KS</h2>
+    <h2>🌤️ Current Weather</h2>
     <p id="weather">Loading weather...</p>
   </div>
 
+  <div class="image">
+    <h2>🖼️ Random Image</h2>
+    <img id="randomImage" src="" alt="Random from Unsplash" />
+  </div>
+
   <script>
-    // TO-DO LIST
+    // TO-DO LIST FUNCTIONALITY
     function addTask() {
       const input = document.getElementById("taskInput");
       const taskText = input.value.trim();
@@ -88,9 +94,9 @@
       input.value = "";
     }
 
-    // WEATHER - Wichita, KS
-    const lat = 37.6872;
-    const lon = -97.3301;
+    // WEATHER FUNCTIONALITY (Open-Meteo)
+    const lat = 40.71; // New York
+    const lon = -74.01;
 
     fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
       .then(response => response.json())
@@ -104,13 +110,18 @@
         console.error(err);
       });
 
-    // RANDOM BACKGROUND IMAGE from Unsplash
-    document.body.style.backgroundImage = "url('https://source.unsplash.com/1600x900/?nature,sky')";
+    // UNSPLASH RANDOM IMAGE
+    const accessKey = "W6FrPYLkDZf19BIX2xbSmMd1t9Wdp5mTsyDS2EfFDWY";
+
+    fetch(`https://api.unsplash.com/photos/random?query=nature&orientation=landscape&client_id=${accessKey}`)
+      .then(res => res.json())
+      .then(data => {
+        const imageUrl = data.urls.regular;
+        document.getElementById("randomImage").src = imageUrl;
+      })
+      .catch(err => {
+        console.error("Failed to load Unsplash image:", err);
+      });
   </script>
 </body>
 </html>
-
-  </script>
-</body>
-</html>
-
