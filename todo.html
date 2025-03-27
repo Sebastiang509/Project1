@@ -2,15 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>To-Do List 🦒</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🦒 Todo + Weather App</title>
   <style>
     body {
       font-family: sans-serif;
-      max-width: 500px;
+      max-width: 600px;
       margin: 40px auto;
       padding: 20px;
-      background: #f9f9f9;
+      background: #f0f4f8;
+    }
+    h1, h2 {
+      text-align: center;
     }
     input, button {
       padding: 10px;
@@ -22,26 +25,42 @@
     }
     li {
       margin: 10px 0;
-      background: #eee;
+      background: #fff;
       padding: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      border-radius: 5px;
     }
     li.done {
       text-decoration: line-through;
       background-color: #c3f7c3;
     }
+    .weather {
+      margin-top: 30px;
+      text-align: center;
+      background: #e0f7fa;
+      padding: 15px;
+      border-radius: 8px;
+    }
   </style>
 </head>
 <body>
   <h1>🦒 To-Do List</h1>
-  <input type="text" id="taskInput" placeholder="Add a new task..." />
-  <button onclick="addTask()">Add</button>
+  <div>
+    <input type="text" id="taskInput" placeholder="Add a new task..." />
+    <button onclick="addTask()">Add</button>
+  </div>
 
   <ul id="taskList"></ul>
 
+  <div class="weather">
+    <h2>🌤️ Current Weather</h2>
+    <p id="weather">Loading weather...</p>
+  </div>
+
   <script>
+    // TO-DO LIST FUNCTIONALITY
     function addTask() {
       const input = document.getElementById("taskInput");
       const taskText = input.value.trim();
@@ -55,7 +74,7 @@
       const deleteBtn = document.createElement("button");
       deleteBtn.textContent = "❌";
       deleteBtn.onclick = (e) => {
-        e.stopPropagation(); // prevent line-through when deleting
+        e.stopPropagation();
         li.remove();
       };
 
@@ -64,6 +83,23 @@
 
       input.value = "";
     }
+
+    // WEATHER FUNCTIONALITY (Open-Meteo)
+    const lat = 40.71; // Example: New York City
+    const lon = -74.01;
+
+    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
+      .then(response => response.json())
+      .then(data => {
+        const weather = data.current_weather;
+        const weatherText = `🌡️ ${weather.temperature}°C | 💨 ${weather.windspeed} km/h`;
+        document.getElementById("weather").textContent = weatherText;
+      })
+      .catch(err => {
+        document.getElementById("weather").textContent = "Could not load weather 😢";
+        console.error(err);
+      });
   </script>
 </body>
 </html>
+
