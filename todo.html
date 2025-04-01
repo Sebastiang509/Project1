@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🦒 Todo + Weather + Image App</title>
+  <title>🦒 Todo + Weather + Image + Email App</title>
   <style>
     body {
       font-family: sans-serif;
@@ -36,7 +36,7 @@
       text-decoration: line-through;
       background-color: #c3f7c3;
     }
-    .weather, .image {
+    .section {
       margin-top: 30px;
       text-align: center;
       background: #e0f7fa;
@@ -49,28 +49,49 @@
       margin-top: 10px;
     }
   </style>
+
+  <!-- EmailJS Script -->
+  <script type="text/javascript" src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script>
+    (function(){
+      emailjs.init("W6FrPYLkDZf19BIX2xbSmMd1t9Wdp5mTsyDS2EfFDWY");
+    })();
+  </script>
 </head>
 <body>
-  <h1>🦒 To-Do List</h1>
+  <h1>🦒 To-Do App with Extras</h1>
+
+  <!-- To-Do Section -->
   <div>
     <input type="text" id="taskInput" placeholder="Add a new task..." />
     <button onclick="addTask()">Add</button>
   </div>
-
   <ul id="taskList"></ul>
 
-  <div class="weather">
+  <!-- Weather Section -->
+  <div class="section">
     <h2>🌤️ Current Weather</h2>
     <p id="weather">Loading weather...</p>
   </div>
 
-  <div class="image">
+  <!-- Unsplash Image Section -->
+  <div class="section">
     <h2>🖼️ Random Image</h2>
     <img id="randomImage" src="" alt="Random from Unsplash" />
   </div>
 
+  <!-- Email Sending Section -->
+  <div class="section">
+    <h2>📧 Send Your Tasks via Email</h2>
+    <form id="emailForm">
+      <input type="email" id="toEmail" placeholder="Recipient Email" required />
+      <button type="submit">Send Email</button>
+    </form>
+    <p id="emailStatus"></p>
+  </div>
+
   <script>
-    // TO-DO LIST FUNCTIONALITY
+    // ✅ To-Do Logic
     function addTask() {
       const input = document.getElementById("taskInput");
       const taskText = input.value.trim();
@@ -78,7 +99,6 @@
 
       const li = document.createElement("li");
       li.textContent = taskText;
-
       li.onclick = () => li.classList.toggle("done");
 
       const deleteBtn = document.createElement("button");
@@ -90,37 +110,56 @@
 
       li.appendChild(deleteBtn);
       document.getElementById("taskList").appendChild(li);
-
       input.value = "";
     }
 
-    // WEATHER FUNCTIONALITY (Open-Meteo)
-    const lat = 40.71; // New York
+    // ✅ Weather from Open-Meteo
+    const lat = 40.71;
     const lon = -74.01;
-
     fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
       .then(response => response.json())
       .then(data => {
         const weather = data.current_weather;
-        const weatherText = `🌡️ ${weather.temperature}°C | 💨 ${weather.windspeed} km/h`;
-        document.getElementById("weather").textContent = weatherText;
+        document.getElementById("weather").textContent =
+          `🌡️ ${weather.temperature}°C | 💨 ${weather.windspeed} km/h`;
       })
       .catch(err => {
         document.getElementById("weather").textContent = "Could not load weather 😢";
         console.error(err);
       });
 
-    // UNSPLASH RANDOM IMAGE
-    const accessKey = "W6FrPYLkDZf19BIX2xbSmMd1t9Wdp5mTsyDS2EfFDWY";
-
-    fetch(`https://api.unsplash.com/photos/random?query=nature&orientation=landscape&client_id=${accessKey}`)
+    // ✅ Random Image from Unsplash
+    const unsplashKey = "W6FrPYLkDZf19BIX2xbSmMd1t9Wdp5mTsyDS2EfFDWY";
+    fetch(`https://api.unsplash.com/photos/random?query=nature&orientation=landscape&client_id=${unsplashKey}`)
       .then(res => res.json())
       .then(data => {
-        const imageUrl = data.urls.regular;
-        document.getElementById("randomImage").src = imageUrl;
+        document.getElementById("randomImage").src = data.urls.regular;
       })
-      .catch(err => {
-        console.error("Failed to load Unsplash image:", err);
+      .catch(err => console.error("Unsplash error:", err));
+
+    // ✅ EmailJS Sending
+    document.getElementById("emailForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const toEmail = document.getElementById("toEmail").value;
+      const tasks = Array.from(document.querySelectorAll("#taskList li")).map(li => li.textContent.replace("❌", "").trim());
+      const message = tasks.length ? tasks.join("\n") : "No tasks added.";
+
+      emailjs.send("your_service_id", "your_template_id", {
+        to_email: toEmail,
+        message: message
+      })
+      .then(() => {
+        document.getElementById("emailStatus").textContent = "✅ Email sent!";
+      }, (err) => {
+        document.getElementById("emailStatus").textContent = "❌ Failed to send.";
+        console.error("EmailJS Error:", err);
+      });
+    });
+  </script>
+</body>
+</html>
+
       });
   </script>
 </body>
