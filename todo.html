@@ -145,7 +145,7 @@
       const tasks = Array.from(document.querySelectorAll("#taskList li")).map(li => li.textContent.replace("❌", "").trim());
       const message = tasks.length ? tasks.join("\n") : "No tasks added.";
 
-      emailjs.send("your_service_id", "your_template_id", {
+      emailjs.send("service_ske4yrq", "template_vfwwzhr", {
         to_email: toEmail,
         message: message
       })
